@@ -13,9 +13,15 @@ coverage.json
 .env
 .local-secret
 node_modules/
+.npm-cache/
+**/.npm-cache/
 frontend/dist/
 frontend/coverage/
 test-results/
 playwright-report/
 staticfiles/
 *.log
+/media/
+/data/
+/.e2e-media/
+frontend/tsconfig.tsbuildinfo

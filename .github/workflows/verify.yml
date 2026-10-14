@@ -1,0 +1,61 @@
+name: Verify assignment
+on: [push, pull_request]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install backend and browser dependencies
+        run: |
+          pip install -r requirements-dev.txt
+          npm ci --prefix frontend
+          cd frontend
+          npx playwright install --with-deps chromium
+      - name: Backend checks and coverage
+        run: |
+          python manage.py check
+          python manage.py makemigrations --check --dry-run
+          ruff check config ledger scripts
+          pytest --cov=ledger --cov=config --cov-branch --cov-report=term-missing --cov-fail-under=80
+      - name: Frontend checks and coverage
+        run: |
+          npm run test:coverage --prefix frontend
+          npm run build --prefix frontend
+      - name: Browser journeys
+        run: npm run test:e2e --prefix frontend
+      - name: Validate public API artifacts
+        run: python scripts/verify_artifacts.py
+      - name: Build and smoke-test Docker image
+        run: |
+          docker build -t splitly:ci .
+          docker run -d --name splitly-ci -p 8088:8000 -e DJANGO_DEBUG=false -e DJANGO_SECRET_KEY=ci-only-not-a-production-secret -e DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1 -e DJANGO_HTTPS=false -e DJANGO_SECURE_COOKIES=false -e SQLITE_PATH=/app/data/ci.sqlite3 -e MEDIA_ROOT=/app/data/receipts splitly:ci
+          trap 'docker logs splitly-ci; docker rm -f splitly-ci' EXIT
+          for attempt in $(seq 1 40); do
+            if curl --fail --silent http://127.0.0.1:8088/health/ready; then
+              curl --fail --silent http://127.0.0.1:8088/ > /dev/null
+              curl --fail --silent http://127.0.0.1:8088/api/docs/ > /dev/null
+              curl --fail --silent http://127.0.0.1:8088/static/drf_spectacular_sidecar/swagger-ui-dist/swagger-ui-bundle.js > /dev/null
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-results
+          path: |
+            frontend/test-results
+            frontend/playwright-report
+          if-no-files-found: ignore
