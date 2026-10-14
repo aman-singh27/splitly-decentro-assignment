@@ -1,0 +1,21 @@
+# Private planning sources are not submission documentation.
+/docs/internal/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+coverage.json
+*.sqlite3
+*.sqlite3-*
+.env
+.local-secret
+node_modules/
+frontend/dist/
+frontend/coverage/
+test-results/
+playwright-report/
+staticfiles/
+*.log
