@@ -4,8 +4,8 @@ Observed on 14 October 2026 with Python 3.13.3, Node 22.17.0 and npm 10.9.2. The
 
 | Check | Observed result |
 | --- | --- |
-| Backend unit/API/database/runtime tests | 82 passed |
-| Backend statement / branch coverage | 95.99% / 83.98%; combined 93.98% |
+| Backend unit/API/database/runtime tests | 98 passed, including Render hostname/TLS/CSRF and startup regressions |
+| Backend statement / branch coverage | 95.97% / 85.51%; combined 94.18% |
 | Frontend unit/component tests | 46 passed |
 | Frontend line / branch coverage | 96.99% / 88.29% |
 | Browser journeys | 30 passed across desktop Chromium and Pixel 7 emulation; no skips |

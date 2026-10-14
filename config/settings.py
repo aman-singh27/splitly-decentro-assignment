@@ -1,6 +1,7 @@
 """Single-origin Django configuration with explicit production safeguards."""
 
 import os
+import re
 import secrets
 from pathlib import Path
 
@@ -20,7 +21,34 @@ if not SECRET_KEY:
         except FileExistsError:
             pass
     SECRET_KEY = secret_path.read_text(encoding="utf-8").strip()
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,testserver").split(",")
+ALLOWED_HOSTS = list(
+    dict.fromkeys(
+        host.strip()
+        for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,testserver").split(
+            ","
+        )
+        if host.strip()
+    )
+)
+# Render supplies its public hostname; this is a hostname, never a URL or '*'.
+# Custom domains remain explicit entries in DJANGO_ALLOWED_HOSTS.
+# https://render.com/docs/environment-variables#render_external_hostname
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME", "").strip().lower()
+if RENDER_EXTERNAL_HOSTNAME:
+    if not re.fullmatch(
+        r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.onrender\.com", RENDER_EXTERNAL_HOSTNAME
+    ):
+        raise ImproperlyConfigured(
+            "RENDER_EXTERNAL_HOSTNAME must be a valid onrender.com hostname."
+        )
+    if RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+RENDER_TLS = os.environ.get("RENDER", "").lower() == "true" and bool(RENDER_EXTERNAL_HOSTNAME)
+# Only Render's private application listener sits behind the managed HTTPS edge.
+# Local/Docker requests never gain HTTPS trust from caller-supplied headers.
+# Waitress must also preserve the trusted scheme (see config.serve).
+# https://docs.djangoproject.com/en/5.2/ref/settings/#secure-proxy-ssl-header
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https") if RENDER_TLS else None
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.auth",

@@ -55,6 +55,10 @@ docker compose up --build
 
 Open port 8000. Compose deliberately disables secure cookies/HTTPS redirect for this local HTTP demonstration. For an HTTPS deployment, restore secure settings and configure trusted origins/hosts. Do not use the Django development server in production. Preserve the volume and secret between restarts; changing the secret invalidates signed invitations/sessions.
 
+## Hosted demonstration
+
+The full application can run as one free Render Docker web service. The selected free demo has temporary storage: expenses and photos reset when Render idles, restarts or redeploys it. A cold first visit can take about one minute. Deployment settings and live verification commands are documented in [hosting notes](docs/public/deployment.md); `render.yaml` contains the reproducible deployment recipe.
+
 ## Architecture
 
 ```mermaid

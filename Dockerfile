@@ -19,4 +19,4 @@ COPY --from=web /web/dist ./frontend/dist/
 RUN useradd --create-home app && mkdir -p /app/data /app/staticfiles && chown -R app:app /app
 USER app
 EXPOSE 8000
-CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && waitress-serve --listen=0.0.0.0:${PORT} config.wsgi:application"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && python -m config.serve"]
