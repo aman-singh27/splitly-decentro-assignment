@@ -2,6 +2,8 @@
 
 A Django expense-sharing application for groups of friends. Create a group, add people, record expenses, and see who owes whom. The responsive frontend uses white/lime surfaces and original monochrome illustrated people. No sign-in is required.
 
+[Live demonstration](https://splitly-decentro.onrender.com) · [Hosted API explorer](https://splitly-decentro.onrender.com/api/docs/)
+
 Equal splitting across every current member is the default. Custom amounts support unequal shares. Bill photos are optional: an expense can be saved without one. This app records debts and payments made elsewhere; it does not transfer money or verify people's identities.
 
 ## Run locally

@@ -2,6 +2,8 @@
 
 The assignment demo uses one free Render Docker web service in Singapore. The image builds React, then runs Django migrations, collects local Swagger assets and starts Waitress on Render's assigned port. The website and API share one HTTPS origin; a separate Vercel frontend is unnecessary for this deployment.
 
+App: [Splitly](https://splitly-decentro.onrender.com). API explorer: [Swagger](https://splitly-decentro.onrender.com/api/docs/).
+
 **Temporary storage:** this is the free demonstration chosen by the owner. Render can idle the service after 15 minutes without traffic. A first request after idling can take about one minute. Local SQLite data, sessions and uploaded bill photographs are lost on idle/restart/redeployment. Old group links may stop working after a reset. Create a fresh group to evaluate the app. Do not use this demonstration as durable financial storage.
 
 ## Configuration
