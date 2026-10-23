@@ -1,3 +1,5 @@
+<img src="assets/github-cover.svg" alt="Splitly — Every balance has a story." width="100%" />
+
 # Splitly
 
 A Django expense-sharing application for groups of friends. Create a group, add people, record expenses, and see who owes whom. The responsive frontend uses white/lime surfaces and original monochrome illustrated people. No sign-in is required.
